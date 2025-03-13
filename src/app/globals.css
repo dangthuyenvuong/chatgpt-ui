@@ -1,0 +1,200 @@
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/container-queries";
+@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
+@theme {
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 240 5.9% 10%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
+
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(240 10% 3.9%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(240 10% 3.9%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(240 10% 3.9%);
+  --color-primary: hsl(240 5.9% 10%);
+  --color-primary-foreground: hsl(0 0% 98%);
+  --color-secondary: hsl(240 4.8% 95.9%);
+  --color-secondary-foreground: hsl(240 5.9% 10%);
+  --color-muted: hsl(240 4.8% 95.9%);
+  --color-muted-foreground: hsl(240 3.8% 46.1%);
+  --color-accent: hsl(240 4.8% 95.9%);
+  --color-accent-foreground: hsl(240 5.9% 10%);
+  --color-destructive: hsl(0 84.2% 60.2%);
+  --color-destructive-foreground: hsl(0 0% 98%);
+  --color-border: hsl(240 5.9% 90%);
+  --color-input: hsl(240 5.9% 90%);
+  --color-ring: hsl(240 5.9% 10%);
+  --radius: 0.5rem;
+}
+/* 
+.dark {
+  @theme {
+    --color-background: hsl(0 0% 13%);
+    --color-foreground: hsl(0 0% 98%);
+    --color-card: hsl(0 0% 13%);
+    --color-card-foreground: hsl(0 0% 98%);
+    --color-popover: hsl(0 0% 13%);
+    --color-popover-foreground: hsl(0 0% 98%);
+    --color-primary: hsl(0 0% 98%);
+    --color-primary-foreground: hsl(240 5.9% 10%);
+    --color-secondary: hsl(0 0% 16%);
+    --color-secondary-foreground: hsl(0 0% 98%);
+    --color-muted: hsl(0 0% 16%);
+    --color-muted-foreground: hsl(0 0% 65%);
+    --color-accent: 0 0% 16%;
+    --color-accent-foreground: hsl(0 0% 98%);
+    --color-destructive: hsl(0 62.8% 30.6%);
+    --color-destructive-foreground: hsl(0 0% 98%);
+    --color-border: hsl(0 0% 16%);
+    --color-input: hsl(0 0% 16%);
+    --color-ring: hsl(240 4.9% 83.9%);
+  }
+} */
+
+@layer base {
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-background: hsl(0 0% 13%);
+      --color-foreground: hsl(0 0% 98%);
+      --color-card: hsl(0 0% 13%);
+      --color-card-foreground: hsl(0 0% 98%);
+      --color-popover: hsl(0 0% 13%);
+      --color-popover-foreground: hsl(0 0% 98%);
+      --color-primary: hsl(0 0% 98%);
+      --color-primary-foreground: hsl(240 5.9% 10%);
+      --color-secondary: hsl(0 0% 16%);
+      --color-secondary-foreground: hsl(0 0% 98%);
+      --color-muted: hsl(0 0% 16%);
+      --color-muted-foreground: hsl(0 0% 65%);
+      --color-accent: 0 0% 16%;
+      --color-accent-foreground: hsl(0 0% 98%);
+      --color-destructive: hsl(0 62.8% 30.6%);
+      --color-destructive-foreground: hsl(0 0% 98%);
+      --color-border: hsl(0 0% 16%);
+      --color-input: hsl(0 0% 16%);
+      --color-ring: hsl(240 4.9% 83.9%);
+    }
+  }
+  [data-theme="light"] {
+    --color-background: hsl(0 0% 100%);
+    --color-foreground: hsl(240 10% 3.9%);
+    --color-card: hsl(0 0% 100%);
+    --color-card-foreground: hsl(240 10% 3.9%);
+    --color-popover: hsl(0 0% 100%);
+    --color-popover-foreground: hsl(240 10% 3.9%);
+    --color-primary: hsl(240 5.9% 10%);
+    --color-primary-foreground: hsl(0 0% 98%);
+    --color-secondary: hsl(240 4.8% 95.9%);
+    --color-secondary-foreground: hsl(240 5.9% 10%);
+    --color-muted: hsl(240 4.8% 95.9%);
+    --color-muted-foreground: hsl(240 3.8% 46.1%);
+    --color-accent: hsl(240 4.8% 95.9%);
+    --color-accent-foreground: hsl(240 5.9% 10%);
+    --color-destructive: hsl(0 84.2% 60.2%);
+    --color-destructive-foreground: hsl(0 0% 98%);
+    --color-border: hsl(240 5.9% 90%);
+    --color-input: hsl(240 5.9% 90%);
+    --color-ring: hsl(240 5.9% 10%);
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+  }
+}
+
+/* Ensure dropdown menus in the sidebar appear above other elements */
+.sidebar-dropdown {
+  z-index: 100;
+}
+/* 
+
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+
+
+@keyframes blob-move {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+    top: 0%;
+    left: 0%;
+  }
+  25% {
+    transform: translate(50px, -30px) scale(1.1);
+    top: 20%;
+    left: 70%;
+  }
+  50% {
+    transform: translate(-20px, 40px) scale(0.9);
+    top: 60%;
+    left: 20%;
+  }
+  75% {
+    transform: translate(30px, 20px) scale(1.05);
+    top: 80%;
+    left: 60%;
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+    top: 0%;
+    left: 0%;
+  }
+}
+
+.animate-blob-move {
+  animation: blob-move 25s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+ */

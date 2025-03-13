@@ -1,0 +1,390 @@
+import type React from "react";
+
+import { useState, useRef, useEffect } from "react";
+import {
+  Search,
+  FileText,
+  Image,
+  MessageSquare,
+  Lightbulb,
+  SendIcon,
+  GripVertical,
+  Code,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ChatInterface } from "@/components/chat-interface";
+import { Header } from "@/components/header";
+import type { ChatItem } from "@/components/chat-sidebar";
+import { useParams } from "react-router-dom";
+import Planning from "@/components/planning";
+
+type QueryType =
+  | "Research"
+  | "Code"
+  | "Writing"
+  | "Image"
+  | "Chat"
+  | "Ideas"
+  | null;
+type ViewMode = "preview" | "code";
+
+// Sample chat data
+const sampleChats: ChatItem[] = [
+  {
+    id: "project1",
+    title: "E-commerce Website",
+    date: "Today",
+    isProject: true,
+    items: [
+      {
+        id: "project1-plan",
+        type: "plan",
+        title: "Development Plan",
+      },
+      {
+        id: "project1-landing",
+        type: "landing",
+        title: "Landing Page",
+      },
+      {
+        id: "project1-feedback",
+        type: "feedback",
+        title: "User Feedback",
+      },
+      {
+        id: "project1-tracking",
+        type: "tracking",
+        title: "Analytics",
+      },
+    ],
+    messages: [
+      {
+        id: "m1",
+        content: "I need help creating a development plan for my new e-commerce website.",
+        isUser: true,
+        timestamp: "2:30 PM",
+      },
+      {
+        id: "m2",
+        content: "I'd be happy to help you create a development plan for your e-commerce website.",
+        isUser: false,
+        timestamp: "2:31 PM",
+      },
+    ],
+  },
+  {
+    id: "project2",
+    title: "Mobile App",
+    date: "Today",
+    isProject: true,
+    items: [
+      {
+        id: "project2-plan",
+        type: "plan",
+        title: "Development Plan",
+      },
+      {
+        id: "project2-landing",
+        type: "landing",
+        title: "App Store Page",
+      },
+      {
+        id: "project2-feedback",
+        type: "feedback",
+        title: "Beta Feedback",
+      },
+      {
+        id: "project2-tracking",
+        type: "tracking",
+        title: "User Metrics",
+      },
+    ],
+    messages: [
+      {
+        id: "m1",
+        content: "Can you help me brainstorm some marketing strategies for my new mobile app?",
+        isUser: true,
+        timestamp: "11:20 AM",
+      },
+      {
+        id: "m2",
+        content: "I'd be happy to help you brainstorm marketing strategies for your mobile app!",
+        isUser: false,
+        timestamp: "11:21 AM",
+      },
+    ],
+  },
+];
+
+export default function ChatDetail() {
+  const [message, setMessage] = useState("");
+  const [selectedType, setSelectedType] = useState<QueryType>(null);
+  const [chats, setChats] = useState<ChatItem[]>(sampleChats);
+  // const [activeChat, setActiveChat] = useState<string | null>(null);
+  const params = useParams<{ id: string }>();
+  const activeChat = params.id;
+  const [showPreview, setShowPreview] = useState(true);
+  const [mainPanelWidth, setMainPanelWidth] = useState(50); // percentage
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const resizingRef = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const adjustTextareaHeight = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    textarea.style.height = "auto";
+    const newHeight = Math.min(textarea.scrollHeight, 200);
+    textarea.style.height = `${newHeight}px`;
+  };
+
+  // Adjust height when message changes
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [message]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+
+    if (activeChat) {
+      // Add message to existing chat
+      const updatedChats = chats.map((chat) => {
+        if (chat.id === activeChat) {
+          return {
+            ...chat,
+            messages: [
+              ...chat.messages,
+              {
+                id: `m${chat.messages.length + 1}`,
+                content: message,
+                isUser: true,
+                timestamp: new Date().toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }),
+              },
+            ],
+          };
+        }
+        return chat;
+      });
+      setChats(updatedChats);
+
+      // Simulate AI response after a short delay
+      setTimeout(() => {
+        const updatedChatsWithResponse = updatedChats.map((chat) => {
+          if (chat.id === activeChat) {
+            return {
+              ...chat,
+              messages: [
+                ...chat.messages,
+                {
+                  id: `m${chat.messages.length + 2}`,
+                  content:
+                    "This is a simulated response. In a real application, this would be generated by an AI model based on your message.",
+                  isUser: false,
+                  timestamp: new Date().toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }),
+                },
+              ],
+            };
+          }
+          return chat;
+        });
+        setChats(updatedChatsWithResponse);
+      }, 1000);
+    } else {
+      // Create a new chat
+      const newChat: ChatItem = {
+        id: `${chats.length + 1}`,
+        title: message.length > 30 ? message.substring(0, 30) + "..." : message,
+        date: "Just now",
+        messages: [
+          {
+            id: "m1",
+            content: message,
+            isUser: true,
+            timestamp: new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          },
+        ],
+      };
+
+      setChats([newChat, ...chats]);
+      setActiveChat(newChat.id);
+
+      // Simulate AI response after a short delay
+      setTimeout(() => {
+        setChats((prevChats) =>
+          prevChats.map((chat) => {
+            if (chat.id === newChat.id) {
+              return {
+                ...chat,
+                messages: [
+                  ...chat.messages,
+                  {
+                    id: "m2",
+                    content:
+                      "This is a simulated response. In a real application, this would be generated by an AI model based on your message.",
+                    isUser: false,
+                    timestamp: new Date().toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }),
+                  },
+                ],
+              };
+            }
+            return chat;
+          })
+        );
+      }, 1000);
+    }
+
+    setMessage("");
+  };
+
+  const handleNewChat = () => {
+    setActiveChat(null);
+  };
+
+  const getCurrentChat = () => {
+    return chats.find((chat) => chat.id === activeChat) || null;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMessage(e.target.value);
+  };
+
+  // Handle resize functionality
+  const handleResizeStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    resizingRef.current = true;
+    document.addEventListener("mousemove", handleResize);
+    document.addEventListener("mouseup", handleResizeEnd);
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none"; // Prevent text selection during resize
+  };
+
+  const handleResize = (e: MouseEvent) => {
+    if (!resizingRef.current || !containerRef.current) return;
+
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const containerWidth = containerRect.width;
+    const mouseX = e.clientX - containerRect.left;
+
+    // Calculate percentage (constrain between 20% and 80%)
+    let newMainPanelWidth = (mouseX / containerWidth) * 100;
+    newMainPanelWidth = Math.max(20, Math.min(80, newMainPanelWidth));
+
+    setMainPanelWidth(newMainPanelWidth);
+  };
+
+  const handleResizeEnd = () => {
+    resizingRef.current = false;
+    document.removeEventListener("mousemove", handleResize);
+    document.removeEventListener("mouseup", handleResizeEnd);
+    document.body.style.cursor = "";
+    document.body.style.userSelect = "";
+  };
+
+  // Clean up event listeners
+  useEffect(() => {
+    return () => {
+      document.removeEventListener("mousemove", handleResize);
+      document.removeEventListener("mouseup", handleResizeEnd);
+    };
+  }, []);
+
+  const queryTypes = [
+    {
+      type: "Research" as QueryType,
+      icon: <Search className="h-3 w-3 mr-1" />,
+    },
+    { type: "Code" as QueryType, icon: <Code className="h-3 w-3 mr-1" /> },
+    {
+      type: "Writing" as QueryType,
+      icon: <FileText className="h-3 w-3 mr-1" />,
+    },
+    { type: "Image" as QueryType, icon: <Image className="h-3 w-3 mr-1" /> },
+    {
+      type: "Chat" as QueryType,
+      icon: <MessageSquare className="h-3 w-3 mr-1" />,
+    },
+    {
+      type: "Ideas" as QueryType,
+      icon: <Lightbulb className="h-3 w-3 mr-1" />,
+    },
+  ];
+
+  useEffect(() => {
+    console.log(activeChat);
+  }, [activeChat]);
+
+  return (
+    <div className="flex flex-1 w-full overflow-hidden" ref={containerRef}>
+      {/* Main Content Area */}
+      <div
+        className="flex flex-1 flex-col transition-all duration-200"
+        // style={{
+        //   width: showPreview ? `${mainPanelWidth}%` : "100%",
+        // }}
+      >
+        <Header chatTitle={getCurrentChat()?.title} />
+
+        <main className="flex-1 w-full overflow-hidden bg-[#212121] text-white">
+          <ChatInterface
+            chat={getCurrentChat()!}
+            message={message}
+            setMessage={setMessage}
+            handleSubmit={handleSubmit}
+          />
+        </main>
+      </div>
+
+      {/* Resize Handle */}
+      {/* {showPreview && (
+        <div
+          className="w-1 hover:w-2 bg-transparent hover:bg-primary/10 cursor-col-resize flex items-center justify-center z-10 transition-all"
+          onMouseDown={handleResizeStart}
+        >
+            
+          <div className="h-8 w-8 flex items-center justify-center">
+            <GripVertical className="h-4 w-4 text-muted-foreground" />
+          </div>
+        </div>
+      )} */}
+
+      {showPreview && (
+        <div
+          className="flex flex-col flex-[2] bg-background"
+          style={{ width: `${100 - mainPanelWidth}%` }}
+        >
+          <div className="flex-1 bg-white h-full">
+            {/* Preview Header */}
+            {/* <div className="h-14 lg:h-16 border-b border-border px-4 flex items-center justify-between bg-[#212121]">
+              <div className="flex items-center">
+                <h2 className="text-sm font-medium">Preview</h2>
+              </div>
+            </div> */}
+            {/* <iframe
+              src="https://v0.dev"
+              className="w-full h-full border-0"
+              title="Preview"
+              sandbox="allow-same-origin allow-scripts"
+            /> */}
+            <div className="overflow-auto h-full">
+              <Planning />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
