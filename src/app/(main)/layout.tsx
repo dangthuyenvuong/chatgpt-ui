@@ -114,7 +114,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
           onChatSelect={handleChatSelect}
           // onNewChat={handleNewChat}
         />
-        <div className="flex flex-1 flex-col w-full overflow-hidden">{children}</div>
+        <div className="flex flex-1 flex-col w-full overflow-auto px-4">{children}</div>
       </div>
     </SidebarProvider>
   )

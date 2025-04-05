@@ -4,9 +4,15 @@ import { lazy } from 'react';
 const FormPage = lazy(() => import('./app/page.tsx'));
 const Plan = lazy(() => import('./app/plan/[id]/page.tsx'));
 const LoginPage = lazy(() => import('./app/login/page.tsx'));
-const DatatablePage = lazy(() => import('./app/datatable/page.tsx'));
+const LandingPage = lazy(() => import('./app/landing-page/page.tsx'));
 const MainLayout = lazy(() => import('./app/(main)/layout.tsx'));
+const TeamsPage = lazy(() => import('./app/(main)/teams/page.tsx'));
+const SocialGPTPage = lazy(() => import('./app/(main)/social-gpt/page.tsx'));
 const MarketplacePage = lazy(() => import('./app/(main)/marketplace/page.tsx'));
+const KnowledgeHubPage = lazy(
+  () => import('./app/(main)/knowledge-hub/page.tsx'),
+);
+const DashboardPage = lazy(() => import('./app/(main)/dashboard/page.tsx'));
 const Home = lazy(() => import('./app/(main)/chat/page.tsx'));
 const ChatDetail = lazy(() => import('./app/(main)/chat/[id]/page.tsx'));
 
@@ -25,9 +31,17 @@ export const PATH = {
 
   LoginPage: '/login',
 
-  DatatablePage: '/datatable',
+  LandingPage: '/landing-page',
+
+  TeamsPage: '/teams',
+
+  SocialGPTPage: '/social-gpt',
 
   MarketplacePage: '/marketplace',
+
+  KnowledgeHubPage: '/knowledge-hub',
+
+  DashboardPage: '/dashboard',
 
   Home: '/chat',
 
@@ -48,8 +62,8 @@ export const router: RouteObject[] = [
     element: <LoginPage />,
   },
   {
-    path: PATH.DatatablePage,
-    element: <DatatablePage />,
+    path: PATH.LandingPage,
+    element: <LandingPage />,
   },
 
   {
@@ -61,8 +75,24 @@ export const router: RouteObject[] = [
     ),
     children: [
       {
+        path: PATH.TeamsPage,
+        element: <TeamsPage />,
+      },
+      {
+        path: PATH.SocialGPTPage,
+        element: <SocialGPTPage />,
+      },
+      {
         path: PATH.MarketplacePage,
         element: <MarketplacePage />,
+      },
+      {
+        path: PATH.KnowledgeHubPage,
+        element: <KnowledgeHubPage />,
+      },
+      {
+        path: PATH.DashboardPage,
+        element: <DashboardPage />,
       },
       {
         path: PATH.Home,

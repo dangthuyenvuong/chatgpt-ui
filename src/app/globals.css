@@ -67,7 +67,7 @@
 @layer base {
   @media (prefers-color-scheme: dark) {
     :root {
-      --color-background: hsl(0 0% 13%);
+      --color-background: hsl(0 3% 8%);
       --color-foreground: hsl(0 0% 98%);
       --color-card: hsl(0 0% 13%);
       --color-card-foreground: hsl(0 0% 98%);
@@ -198,3 +198,96 @@
   animation-delay: 4s;
 }
  */
+
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) rotate(25deg);
+  }
+  100% {
+    transform: translateX(200%) rotate(25deg);
+  }
+}
+
+
+
+
+@keyframes sparkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  20%,
+  80% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.ai-create-button {
+  position: relative;
+  overflow: hidden;
+  background-size: 200% 200%;
+  animation: gradient-shift 5s ease infinite, float 3s ease-in-out infinite;
+  transition: all 0.3s ease;
+}
+
+.ai-create-button::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateX(-100%) rotate(25deg);
+  animation: shine 6s infinite;
+}
+
+.ai-create-button:hover {
+  transform: translateY(-2px) scale(1.02);
+  animation: gradient-shift 3s ease infinite, border-glow 2s infinite;
+}
+
+.sparkle {
+  position: absolute;
+  background: white;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.sparkle-1 {
+  top: 20%;
+  left: 20%;
+  animation: sparkle 2s infinite 0.3s;
+}
+
+.sparkle-2 {
+  top: 60%;
+  left: 80%;
+  animation: sparkle 2s infinite 0.7s;
+}
+
+.sparkle-3 {
+  top: 30%;
+  left: 60%;
+  animation: sparkle 2s infinite 1.1s;
+}
+
+.sparkle-4 {
+  top: 70%;
+  left: 30%;
+  animation: sparkle 2s infinite 1.5s;
+}
+

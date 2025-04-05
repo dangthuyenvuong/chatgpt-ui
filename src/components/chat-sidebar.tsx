@@ -25,6 +25,10 @@ import {
   ThumbsUp,
   BarChart3,
   ChevronRight,
+  Zap,
+  Users,
+  Database,
+  LayoutDashboard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,6 +56,10 @@ import { PricingDialog } from "@/components/pricing-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SettingsDialog } from "./settings/settings-dialog";
 import { RenameDialog } from "./rename-dialog";
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
+import { ChatTemplatesDialog } from "./chat-templates-dialog";
+import { PersonalTemplatesDialog } from "./personal-template-dialog";
+import { ProjectSettingsDialog } from "./project-settings-dialog";
 
 export type ProjectItem = {
   id: string;
@@ -94,9 +102,25 @@ export function ChatSidebar({
   const [settingsOpen, setSettingsOpen] = useState(false);
   const { id: activeChat } = useParams<{ id: string }>();
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [templatesDialogOpen, setTemplatesDialogOpen] = useState(false);
+  const [selectedChatForSettings, setSelectedChatForSettings] = useState<
+    string | null
+  >(null);
+  const [personalTemplatesDialogOpen, setPersonalTemplatesDialogOpen] =
+    useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
+    null
+  );
   const [expandedProjects, setExpandedProjects] = useState<
     Record<string, boolean>
   >({});
+  const [itemToDelete, setItemToDelete] = useState<{
+    id: string;
+    name: string;
+    type: "chat" | "project" | "projectItem";
+  } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [itemToRename, setItemToRename] = useState<{
     id: string;
     name: string;
@@ -177,15 +201,15 @@ export function ChatSidebar({
     });
   };
 
-  const handleDeleteChat = (e: React.MouseEvent, chatId: string) => {
-    e.stopPropagation();
-    // In a real app, this would show a confirmation dialog
-    toast({
-      title: "Chat deleted",
-      description: "The chat has been permanently deleted.",
-      variant: "destructive",
-    });
-  };
+  // const handleDeleteChat = (e: React.MouseEvent, chatId: string) => {
+  //   e.stopPropagation();
+  //   // In a real app, this would show a confirmation dialog
+  //   toast({
+  //     title: "Chat deleted",
+  //     description: "The chat has been permanently deleted.",
+  //     variant: "destructive",
+  //   });
+  // };
 
   const navigateToMarketplace = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -207,11 +231,66 @@ export function ChatSidebar({
     }
   };
 
+  const handleDeleteChat = (
+    e: React.MouseEvent,
+    chatId: string,
+    chatTitle: string,
+    type: "chat" | "project" | "projectItem" = "chat"
+  ) => {
+    e.stopPropagation();
+    setItemToDelete({ id: chatId, name: chatTitle, type });
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!itemToDelete) return;
+
+    setIsDeleting(true);
+
+    // Giả lập thời gian xóa
+    setTimeout(() => {
+      // Xóa chat hoặc project khỏi danh sách
+      // setChats((prevChats) => prevChats.filter((chat) => chat.id !== itemToDelete.id))
+
+      // Hiển thị thông báo
+      toast({
+        title: "Đã xóa",
+        description: `${itemToDelete.type === "project" ? "Dự án" : "Cuộc trò chuyện"} "${itemToDelete.name}" đã được xóa`,
+        variant: "default",
+      });
+
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+      setItemToDelete(null);
+
+      // Nếu chat đang được chọn bị xóa, chuyển về trang chính
+      if (activeChat === itemToDelete.id) {
+        // onNewChat()
+      }
+    }, 1000);
+  };
+  const handleAddTemplateToProject = (
+    templateId: string,
+    projectId: string
+  ) => {
+    // Here you would implement the logic to add the selected template to the project
+    toast({
+      title: "Template added",
+      description: `Template ${templateId} added to project`,
+    });
+    setTemplatesDialogOpen(false);
+  };
+
+  const handleOpenChatSettings = (e: React.MouseEvent, chatId: string) => {
+    e.stopPropagation();
+    setSelectedChatForSettings(chatId);
+  };
+
   return (
     <Sidebar className="bg-[#1a1a1a] text-white" collapsible="offcanvas">
       {/* Logo and collapse button row */}
       <div className="flex items-center justify-between px-3 h-14 lg:h-16 border-b">
-        <div className="font-semibold text-lg">PlannerAI</div>
+        <div className="font-semibold text-lg">SpaceGPT</div>
         <SidebarTrigger className="h-8 w-8" />
       </div>
 
@@ -227,7 +306,7 @@ export function ChatSidebar({
                 }}
               >
                 <Plus size={16} />
-                <span>New Chat</span>
+                <span>New Project</span>
               </Button>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -238,8 +317,24 @@ export function ChatSidebar({
         {/* First Section - Marketplace and Feedback */}
         <div className="px-2 py-2">
           <SidebarMenu>
+            {/*
             <SidebarMenuItem>
-              <SidebarMenuButton
+             
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={() => navigate("/dashboard")}
+                  className={cn(
+                    "px-3",
+                    location.pathname === "/dashboard"
+                      ? "bg-secondary"
+                      : "hover:bg-secondary/50"
+                  )}
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  <span>Dashboard</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+               <SidebarMenuButton
                 onClick={navigateToMarketplace}
                 className={cn(
                   "px-3",
@@ -252,6 +347,37 @@ export function ChatSidebar({
                 <span>Marketplace</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
+             
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={() => navigate("/teams")}
+                className={cn(
+                  "px-3",
+                  location.pathname === "/teams"
+                    ? "bg-secondary"
+                    : "hover:bg-secondary/50"
+                )}
+              >
+                <Users className="h-4 w-4" />
+                <span>Teams</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={() => navigate("/knowledge-hub")}
+                className={cn(
+                  "px-3",
+                  location.pathname === "/knowledge-hub"
+                    ? "bg-secondary"
+                    : "hover:bg-secondary/50"
+                )}
+              >
+                <Database className="h-4 w-4" />
+                <span>Knowledge Hub</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+*/}
+
             <SidebarMenuItem>
               <SidebarMenuButton
                 onClick={() => setFeedbackOpen(true)}
@@ -275,15 +401,14 @@ export function ChatSidebar({
             {chats.map((chat) => (
               <SidebarMenuItem
                 key={chat.id}
-                className="group menu-item"
-                onClick={() => {
-                  navigate(`/chat/${chat.id}`);
-                }}
+                // onClick={() => {
+                //   navigate(`/chat/${chat.id}`);
+                // }}
               >
                 <div className="w-full">
                   <button
                     className={cn(
-                      "flex items-center w-full text-left px-3 py-2 rounded-md relative gap-2 cursor-pointer",
+                      "group menu-item flex items-center w-full text-left pl-3 pr-2 py-2 rounded-md relative gap-2 cursor-pointer",
                       activeChat === chat.id
                         ? "bg-secondary"
                         : "hover:bg-secondary/50"
@@ -306,9 +431,6 @@ export function ChatSidebar({
                     <div className="flex-1 truncate">
                       <span className="text-sm">{chat.title}</span>
                     </div>
-                    {/* {hoveredChat == null && hoveredChat === chat.id && ( */}
-
-                    {/* )} */}
 
                     {/* {(hoveredChat === chat.id || activeChat === chat.id) && ( */}
                     <DropdownMenu>
@@ -327,13 +449,26 @@ export function ChatSidebar({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-[160px]">
                         <DropdownMenuItem
+                          onClick={(e) => handleOpenChatSettings(e, chat.id)}
+                        >
+                          <Settings className="mr-2 h-4 w-4" />
+                          <span>Cài đặt</span>
+                        </DropdownMenuItem>
+                        {/* <DropdownMenuItem
                           onClick={(e) => handleShareChat(e, chat.id)}
                         >
                           <Share className="mr-2 h-4 w-4" />
                           <span>Chia sẻ</span>
-                        </DropdownMenuItem>
+                        </DropdownMenuItem> */}
                         <DropdownMenuItem
-                          onClick={(e) => handleRenameChat(e, chat.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDoubleClick(
+                              chat.id,
+                              chat.title,
+                              "projectItem"
+                            );
+                          }}
                         >
                           <Edit className="mr-2 h-4 w-4" />
                           <span>Đổi tên</span>
@@ -345,8 +480,10 @@ export function ChatSidebar({
                           <span>Lưu trữ</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          className="text-destructive focus:text-destructive"
-                          onClick={(e) => handleDeleteChat(e, chat.id)}
+                          className="text-red-500 focus:text-red-500"
+                          onClick={(e) =>
+                            handleDeleteChat(e, chat.id, chat.title, "chat")
+                          }
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
                           <span>Xóa</span>
@@ -357,33 +494,119 @@ export function ChatSidebar({
                   </button>
                   {/* Render project items if expanded */}
                   {expandedProjects[chat.id] && (
-                    <div className="">
-                      {chat.items?.map((item) => (
-                        <SidebarMenuItem
-                          key={item.id}
-                          className="rounded-md hover:bg-secondary/50 pl-6 pr-2 py-1 cursor-pointer"
-                          onClick={() => {
-                            // When clicking a project item, we need to make sure the parent project is expanded
-                            setExpandedProjects((prev) => ({
-                              ...prev,
-                              [chat.id]: true,
-                            }));
-                            onChatSelect(item.id);
-                          }}
-                          onDoubleClick={(e) => {
+                    <div className="pl-5">
+                      <div className="border-l border-border pl-1">
+                        {chat.items?.map((item) => (
+                          <SidebarMenuItem
+                            key={item.id}
+                            className="rounded-md hover:bg-secondary/50 py-1 cursor-pointer group sub-item"
+                            onClick={() => {
+                              // When clicking a project item, we need to make sure the parent project is expanded
+                              setExpandedProjects((prev) => ({
+                                ...prev,
+                                [chat.id]: true,
+                              }));
+                              onChatSelect(item.id);
+                            }}
+                            onDoubleClick={(e) => {
+                              e.stopPropagation();
+                              handleDoubleClick(chat.id, item.title, "project");
+                            }}
+                          >
+                            <SidebarMenuButton
+                              className="cursor-pointer"
+                              isActive={activeChat === item.id}
+                            >
+                              {getItemIcon(item.type)}
+                              <span className="flex-1 truncate">
+                                {item.title}
+                              </span>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger
+                                  asChild
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 p-0 ml-1 opacity-70 hover:opacity-100 invisible group-[.sub-item:hover]:visible"
+                                  >
+                                    <MoreVertical size={14} />
+                                    <span className="sr-only">
+                                      More options
+                                    </span>
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                  align="end"
+                                  className="w-[160px]"
+                                >
+                                  <DropdownMenuItem
+                                    onClick={(e) =>
+                                      handleOpenChatSettings(e, chat.id)
+                                    }
+                                  >
+                                    <Settings className="mr-2 h-4 w-4" />
+                                    <span>Cài đặt</span>
+                                  </DropdownMenuItem>
+                                  {/* <DropdownMenuItem
+                          onClick={(e) => handleShareChat(e, chat.id)}
+                        >
+                          <Share className="mr-2 h-4 w-4" />
+                          <span>Chia sẻ</span>
+                        </DropdownMenuItem> */}
+                                  <DropdownMenuItem
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDoubleClick(
+                                        chat.id,
+                                        chat.title,
+                                        "projectItem"
+                                      );
+                                    }}
+                                  >
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    <span>Đổi tên</span>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={(e) =>
+                                      handleArchiveChat(e, chat.id)
+                                    }
+                                  >
+                                    <Archive className="mr-2 h-4 w-4" />
+                                    <span>Lưu trữ</span>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    className="text-red-500 focus:text-red-500"
+                                    onClick={(e) =>
+                                      handleDeleteChat(
+                                        e,
+                                        chat.id,
+                                        chat.title,
+                                        "chat"
+                                      )
+                                    }
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    <span>Xóa</span>
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        ))}
+                        <button
+                          className="cursor-pointer w-full flex items-center justify-center p-1.5 border border-dashed rounded-lg text-sm text-muted-foreground hover:bg-muted/50 transition-colors"
+                          onClick={(e) => {
                             e.stopPropagation();
-                            handleDoubleClick(chat.id, chat.title, "project");
+                            // setSelectedProjectId(chat.id);
+                            // setPersonalTemplatesDialogOpen(true);
+                            navigate(`/chat`);
                           }}
                         >
-                          <SidebarMenuButton
-                            className="cursor-pointer"
-                            isActive={activeChat === item.id}
-                          >
-                            {getItemIcon(item.type)}
-                            <span>{item.title}</span>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      ))}
+                          <Plus className="h-4 w-4 mr-1" /> Add Chat
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -413,13 +636,21 @@ export function ChatSidebar({
           <p className="mb-2 text-xs text-gray-400">
             Get unlimited chats, priority support, and advanced features.
           </p>
-          <Button
-            size="sm"
-            className="w-full"
+          <button
             onClick={() => setPricingOpen(true)}
+            className="ai-create-button w-full relative overflow-hidden group bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 h-10 rounded-md font-medium cursor-pointer"
           >
-            Upgrade
-          </Button>
+            <div className="sparkle sparkle-1"></div>
+            <div className="sparkle sparkle-2"></div>
+            <div className="sparkle sparkle-3"></div>
+            <div className="sparkle sparkle-4"></div>
+
+            <div className="relative flex items-center justify-center gap-2 z-10">
+              <Zap className="h-4 w-4" />
+              <span className="font-medium text-sm">Upgrade</span>
+              <Sparkles className="h-4 w-4" />
+            </div>
+          </button>
         </div>
         {/* Account Section - Added below the upgrade card */}
         <DropdownMenu>
@@ -475,6 +706,36 @@ export function ChatSidebar({
           onOpenChange={setRenameDialogOpen}
           currentName={itemToRename.name}
           onRename={handleRename}
+        />
+      )}
+      {itemToDelete && (
+        <ConfirmDeleteDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          itemName={itemToDelete.name}
+          onConfirm={handleConfirmDelete}
+          isDeleting={isDeleting}
+        />
+      )}
+      {/* <ChatTemplatesDialog
+        open={templatesDialogOpen}
+        onOpenChange={setTemplatesDialogOpen}
+        projectId={selectedProjectId || ""}
+        onSelectTemplate={handleAddTemplateToProject}
+      /> */}
+      <PersonalTemplatesDialog
+        open={personalTemplatesDialogOpen}
+        onOpenChange={setPersonalTemplatesDialogOpen}
+        projectId={selectedProjectId || ""}
+        onSelectTemplate={handleAddTemplateToProject}
+      />
+
+      {selectedChatForSettings && (
+        <ProjectSettingsDialog
+          open={true}
+          onOpenChange={() => setSelectedChatForSettings(null)}
+          chats={chats}
+          selectedChatForSettings={selectedChatForSettings}
         />
       )}
     </Sidebar>

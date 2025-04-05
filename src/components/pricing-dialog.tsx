@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
 import {
   Accordion,
   AccordionContent,
@@ -26,7 +26,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DialogClose } from "@radix-ui/react-dialog";
 
 type BillingPeriod = "monthly" | "yearly";
 
@@ -255,17 +254,17 @@ export function PricingDialog({ open, onOpenChange }: PricingDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-full w-full h-screen p-0 overflow-auto">
-        <DialogClose>
-          <button
+        <DialogClose className="fixed right-4 top-4 z-10">
+          <div
             // onClick={() => onOpenChange(false)}
-            className="cursor-pointer absolute right-4 top-4 z-10 rounded-full p-2 bg-black/20 hover:bg-black/40 transition-colors"
+            className="block cursor-pointer absolute right-4 top-4 z-10 rounded-full p-2 bg-black/20 hover:bg-black/40 transition-colors"
             aria-label="Close"
           >
             <X className="h-6 w-6" />
-          </button>
+          </div>
         </DialogClose>
 
-        <div className="py-12 px-4 md:px-8 lg:px-12 relative">
+        <div className="py-12 px-4 md:px-8 lg:px-12 relative w-full h-full overflow-auto">
           <div className="w-full space-y-12 max-w-7xl mx-auto">
             <div className="text-center space-y-4">
               <h1 className="text-3xl md:text-4xl font-bold">
@@ -312,11 +311,11 @@ export function PricingDialog({ open, onOpenChange }: PricingDialogProps) {
               {pricingTiers.map((tier) => (
                 <Card
                   key={tier.name}
-                  className={`flex flex-col ${tier.popular ? "border-primary shadow-md relative" : ""}`}
+                  className={`flex flex-col ${tier.popular ? "border-green-600 shadow-md relative bg-gradient-to-br from-transparent via-green-500/5 to-transparent" : ""}`}
                 >
                   {tier.popular && (
                     <div className="absolute top-0 right-0 transform translate-x-2 -translate-y-2">
-                      <span className="bg-primary text-primary-foreground text-xs font-medium px-2 py-1 rounded-md">
+                      <span className="text-white text-xs font-medium px-2 py-1 rounded-md bg-green-600">
                         Popular
                       </span>
                     </div>

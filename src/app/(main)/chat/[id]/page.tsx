@@ -18,6 +18,8 @@ import { Header } from "@/components/header";
 import type { ChatItem } from "@/components/chat-sidebar";
 import { useParams } from "react-router-dom";
 import Planning from "@/components/planning";
+import { ChatBubble } from "@/components/chat-bubble";
+import { BubbleChat } from "@/components/bubble-chat";
 
 type QueryType =
   | "Research"
@@ -385,6 +387,7 @@ export default function ChatDetail() {
           </div>
         </div>
       )}
+      <BubbleChat />
     </div>
   );
 }
